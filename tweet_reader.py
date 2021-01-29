@@ -4,7 +4,7 @@ from info_extractor import *
 test_awards = []
 test_nominees = []
 # Main pipeline
-limit = 10000
+limit = 30000
 def AnalyzeTweets():
     for i, tweet in enumerate(tweets):
         if i % 1000 == 0:
@@ -14,14 +14,12 @@ def AnalyzeTweets():
         if not text: continue
 
         #print("Tweet {}:".format(i), text)
-        extractInfo(text)
-
-        # if containsAnyOf(text, ["best motion picture", "best performance", 
-        # "best supporting", "best director", "best screenplay", "best animated"]):
-        #     test_awards.append(text)
-
-        # if containsAnyOf(text, ["i hope", "my bet", "will win", "doesn't win", "didn't win"]):
-        #     test_nominees.append(text)
+        #extractInfo(text)
+        # for nom in ["leonardo", "alan", "philip", "tommy"]:
+        #     if nom in text: test_nominees.append(text)
+        award_name = findAward(text)
+        if award_name:
+            awardsDict.foundAward(award_name)
 
         if i >= limit:
             print("Finished analyzing tweets.")
@@ -32,7 +30,7 @@ def AnalyzeTweets():
 # Clean Tweet - Determines if Tweet is usable for information extraction and cleans the text.
 # Ensures text is in English, removes emojis, @ mentions, #goldenglobe
 def cleanTweet(text):
-    if len(text) < 10: return False
+    if len(text) < 6: return False
     text = demoji(text)
     if not containsAnyOf(text, ["best", "award", "nominee", "host"]): return False
     try:

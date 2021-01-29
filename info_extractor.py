@@ -60,3 +60,52 @@ def findRelations(text):
 
             relations.append(("nominees", award, entity))
     return relations
+
+
+award_pos = ["ADJ", "NOUN", "ADP", "DET", "PUNCT", "CCONJ"]
+
+def findAward(text):
+    Text = DecomposedText(text)
+    start = False
+    end = False
+    dash = False
+    
+    for i, pos in enumerate(Text.pos):
+        if not start and i >= len(Text.text) - 2: break
+
+        # Start reading potential award
+        if not start and pos == "ADJ" and (Text.pos[i+1] == "NOUN" or Text.pos[i+1] == "ADJ" or Text.pos[i+1] == "VERB") and (Text.lemma[i] == "good"):
+            start = i
+            continue
+
+        # Restrict certain words from counting as award
+        if start and pos in ["ADP", "DET", "PUNCT", "CCONJ"]:
+            if Text.text[i] not in ["in", "a", "-", "or"]:
+                end = i
+                break
+        
+
+        if start and Text.text[i] == "-":
+            if dash or (Text.pos[i + 1] != "NOUN") or (Text.text[i + 1] not in ["drama", "musical", "comedy", "foreign", "animated"]):
+                end = i
+                break
+            dash = True
+
+        # Continue reading until not valid award pos, unless it's only the second in the sequence
+        if start and pos not in award_pos:
+            if i == start + 1:
+                continue
+            end = i
+            break
+
+
+    if start and not end: end = len(Text.text)
+    if not (end - start >= 3):
+        return False
+
+    award_name = Text.doc[start:end].text
+    print(award_name)
+    return award_name
+
+
+findAward("best supporting actor - Miniseries or Television Film was so cool")

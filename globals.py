@@ -82,6 +82,7 @@ def containsAnyOf(str, strList):
 
 class DecomposedText():
     def __init__(self, text):
+        text = text.lower()
         self.full_text = text
         self.doc = nlp(text)
         self.text = []
