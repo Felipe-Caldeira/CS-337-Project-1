@@ -4,6 +4,7 @@ import en_core_web_sm
 from imdb import IMDb
 from difflib import SequenceMatcher
 import json
+import pandas as pd
 
 # This function returns a metric (0 to 1) for how similar strings a and b are.
 def similar(a, b):
@@ -17,7 +18,7 @@ nlp = spacy.load("en_core_web_sm")
 # Initializing tweets from json
 # Load in the tweets json
 with open('data/gg2013.json') as f:
-    tweets = json.load(f)
+    tweets = json.load(f)[10000:]
 
 
 # Awards class - Contains all extracted awards as keys, whose values are dictionaries containing their
@@ -28,6 +29,21 @@ class Awards():
     def __init__(self):
         self.dict = {}
 
+    def foundRelation(self, type, award_name, entity_name): # 'type' can be 'presenters', 'nominees', 'winner', or False
+        self.foundAward(award_name)
+        if not type: return
+        
+        if entity_name in self.dict[award_name][type]:
+            self.dict[award_name][type][entity_name] += 1
+        else:
+            self.dict[award_name][type][entity_name] = 1
+
+    def foundAward(self, award_name):
+        if award_name in self.dict:
+            self.dict[award_name]['tally'] += 1
+        else:
+            self.newAward(award_name)
+
     def newAward(self, award_name):
         self.dict[award_name] = {
             "tally" : 1,
@@ -36,30 +52,7 @@ class Awards():
             "winner" : {}
         }
 
-    def tallyAward(self, award_name):
-        self.dict[award_name].tally += 1
-
-    def newPresenter(self, award_name, presenter_name):
-        self.dict[award_name].presenters[presenter_name] = 1
-
-    def tallyPresenter(self, award_name, presenter_name):
-        self.dict[award_name].presenters[presenter_name] += 1
-
-    def newNominee(self, award_name, nominee_name):
-        self.dict[award_name].nominees[nominee_name] = 1
-
-    def tallyNominee(self, award_name, nominee_name):
-        self.dict[award_name].nominees[nominee_name] += 1
-
-    def newWinner(self, award_name, winner_name):
-        self.dict[award_name].winner[presenter_name] = 1
-
-    def tallyWinner(self, award_name, winner_name):
-        self.dict[award_name].winner[presenter_name] += 1
-
-awardsDict = Awards()
-
-
+awardsDict = Awards() 
 
 # Clean emojis from tweets
 def demoji(text):
@@ -82,3 +75,32 @@ def demoji(text):
         "]+", flags=re.UNICODE)
 
     return emoji_pattern.sub(r'', text)
+
+def containsAnyOf(str, strList):
+    return any(map(str.__contains__, strList))
+
+
+class DecomposedText():
+    def __init__(self, text):
+        self.full_text = text
+        self.doc = nlp(text)
+        self.text = []
+        self.lemma = []
+        self.pos = []
+        self.parent = []
+        self.children = []
+        self.nouns = []
+
+        for token in self.doc:
+            self.text.append(token.text)
+            self.lemma.append(token.lemma_)
+            self.pos.append(token.pos_)
+            self.parent.append(token.head)
+            self.children.append([child for child in token.children])
+
+        self.nouns = [chunk for chunk in self.doc.noun_chunks]
+
+    def show(self):
+        print(pd.DataFrame({'Text':self.text, 'Lemma':self.lemma, 'Pos':self.pos, 'Parent':self.parent, 'Children':self.children}))
+        print(self.nouns)
+
