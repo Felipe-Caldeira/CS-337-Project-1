@@ -18,13 +18,11 @@ nlp = spacy.load("en_core_web_sm")
 # Initializing tweets from json
 # Load in the tweets json
 with open('data/gg2013.json') as f:
-    tweets = json.load(f)[10000:]
+    tweets = json.load(f)[0000:]
 
 
 # Awards class - Contains all extracted awards as keys, whose values are dictionaries containing their
 # extraction tally, related presenters, nominees, winners.
-# global awards_dict
-
 class Awards():
     def __init__(self):
         self.dict = {}
@@ -80,6 +78,8 @@ def containsAnyOf(str, strList):
     return any(map(str.__contains__, strList))
 
 
+# Text decomposer: Creates an object that allows one to access the tokenized form of a texxt along with its 
+# part-of-speech tagging, lemmas, and relations to other words.
 class DecomposedText():
     def __init__(self, text):
         text = text.lower()

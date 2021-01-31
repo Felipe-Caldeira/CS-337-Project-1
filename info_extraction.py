@@ -1,7 +1,7 @@
 from globals import *
 
 # Person and Movie identifier - Takes in a string and determines if it is the name of a person or a movie.
-# Returns either "Person", "Movie", or False, as well as the official name of the movie.
+# Returns either "Person", "Movie", or False, as well as the official name of the person/movie.
 def personOrMovie(name):
     name = name.lower()
     people = ia.search_person(name)
@@ -28,6 +28,10 @@ def personOrMovie(name):
     return (type, entity)
 
 
+# Relation finder - Takes in a text and finds relations between awards and entities.
+# Returns a list of relations, which are tuples in the form: (type, award, entity), where 
+# 'type' is 'nominees', 'winner', and 'presenters'; 'award' is the name of the award; and 
+# 'entity' is the name of the person/movie.
 def findRelations(text):
     Text = DecomposedText(text)
     relations = []
@@ -62,6 +66,8 @@ def findRelations(text):
     return relations
 
 
+# Award finder - This function specifically finds award names and adds them to the awardsDict. 
+# It's somewhat effective, though it does have a couple hardcoded words which is isn't ideal.
 award_pos = ["ADJ", "NOUN", "ADP", "DET", "PUNCT", "CCONJ"]
 
 def findAward(text):
@@ -69,7 +75,7 @@ def findAward(text):
     start = False
     end = False
     dash = False
-    
+
     for i, pos in enumerate(Text.pos):
         if not start and i >= len(Text.text) - 2: break
 
@@ -84,7 +90,7 @@ def findAward(text):
                 end = i
                 break
         
-
+        # Stop reading award if encountering a second dash, or if the word after the first dash isn't valid.
         if start and Text.text[i] == "-":
             if dash or (Text.pos[i + 1] != "NOUN") or (Text.text[i + 1] not in ["drama", "musical", "comedy", "foreign", "animated"]):
                 end = i
@@ -98,14 +104,13 @@ def findAward(text):
             end = i
             break
 
-
+    # If reading an award and reached the end of the text, stop reading. 
+    # If shorter than 3 words, ignore it (though 2 words would be useful for 'best dressed')
     if start and not end: end = len(Text.text)
     if not (end - start >= 3):
         return False
 
     award_name = Text.doc[start:end].text
-    print(award_name)
+    #print(award_name)
     return award_name
 
-
-findAward("best supporting actor - Miniseries or Television Film was so cool")
