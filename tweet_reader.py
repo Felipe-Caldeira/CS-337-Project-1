@@ -10,6 +10,7 @@ test_nominees = []
 # Main pipeline
 
 limit = 10000 # Limit how many tweets to read.
+
 def AnalyzeTweets():
     for i, tweet in enumerate(tweets):
         # Progress meter:
@@ -33,7 +34,7 @@ def AnalyzeTweets():
 # Clean Tweet - Determines if Tweet is usable for information extraction and cleans the text.
 # Ensures text is in English, removes emojis, etc.
 def cleanTweet(text):
-    if len(text) < 6: return False
+    if len(text) < 24: return False
     text = demoji(text)
     if not containsAnyOf(text, ["best", "award", "nominee", "host"]): return False
     try:

@@ -1,5 +1,6 @@
 from globals import *
 
+
 # Person and Movie identifier - Takes in a string and determines if it is the name of a person or a movie.
 # Returns either "Person", "Movie", or False, as well as the official name of the person/movie.
 def personOrMovie(name):
@@ -21,8 +22,8 @@ def personOrMovie(name):
     # print("Movie match (short):", movie_match_s)
     # print("Movie match (avg)", movie_match_avg)
 
-
-    (entity, match, type) = (person['name'], person_match, "person") if person_match > movie_match_avg else (movie['title'], movie_match_avg, "movie") if movie else (False, 0.0, False)
+    (entity, match, type) = (person['name'], person_match, "person") if person_match > movie_match_avg else (
+        movie['title'], movie_match_avg, "movie") if movie else (False, 0.0, False)
     if match < .65:
         return (False, False)
     return (type, entity)
@@ -70,17 +71,35 @@ def findRelations(text):
 # It's somewhat effective, though it does have a couple hardcoded words which is isn't ideal.
 award_pos = ["ADJ", "NOUN", "ADP", "DET", "PUNCT", "CCONJ"]
 
+
 def findAward(text):
     Text = DecomposedText(text)
     start = False
     end = False
     dash = False
 
+    # check if 'goes' is in the tweet, make sure 'to' comes right after. Extract 'Best Award' from tweet and return
+    if 'goes' in Text.text:
+        goesidx = Text.text.index('goes')
+        if Text.text[goesidx + 1] == 'to':
+            if 'Best' in Text.text:
+                award_name = 'Best' + Text.text[Text.text.index('Best') + 1]
+                return award_name
+            elif 'best' in Text.text:
+                award_name = 'Best' + Text.text[Text.text.index('best') + 1]
+                return award_name
+
+
+
+
+
     for i, pos in enumerate(Text.pos):
         if not start and i >= len(Text.text) - 2: break
 
         # Start reading potential award
-        if not start and pos == "ADJ" and (Text.pos[i+1] == "NOUN" or Text.pos[i+1] == "ADJ" or Text.pos[i+1] == "VERB") and (Text.lemma[i] == "good"):
+        if not start and pos == "ADJ" and (
+                Text.pos[i + 1] == "NOUN" or Text.pos[i + 1] == "ADJ" or Text.pos[i + 1] == "VERB") and (
+                Text.lemma[i] == "good"):
             start = i
             continue
 
@@ -89,10 +108,11 @@ def findAward(text):
             if Text.text[i] not in ["in", "a", "-", "or"]:
                 end = i
                 break
-        
+
         # Stop reading award if encountering a second dash, or if the word after the first dash isn't valid.
         if start and Text.text[i] == "-":
-            if dash or (Text.pos[i + 1] != "NOUN") or (Text.text[i + 1] not in ["drama", "musical", "comedy", "foreign", "animated"]):
+            if dash or (Text.pos[i + 1] != "NOUN") or (
+                    Text.text[i + 1] not in ["drama", "musical", "comedy", "foreign", "animated"]):
                 end = i
                 break
             dash = True
@@ -111,6 +131,5 @@ def findAward(text):
         return False
 
     award_name = Text.doc[start:end].text
-    #print(award_name)
+    # print(award_name)
     return award_name
-
