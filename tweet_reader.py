@@ -6,56 +6,63 @@ import math
 test_awards = []
 test_nominees = []
 
+# Limit how many tweets to read
+limit = len(tweets)
+
 
 # Main pipeline
-
-limit = 10000 # Limit how many tweets to read.
+limit = min(limit, len(tweets))
 def AnalyzeTweets():
     for i, tweet in enumerate(tweets):
         # Progress meter:
         if i % 1000 == 0:
             progress = i/limit
-            print("{}{} {}/{} tweets analyzed.".format("█"*math.floor(progress*50), "░"*(50 - math.floor(progress*50)), i, limit))
-
-        # Clean tweet, and skip to next tweet if it's not relevant/useful.
-        text = cleanTweet(tweet['text'].lower())
-        if not text: continue
-
-        # Information extraction function which actually extracts info and relations and adds them to the awardsDict.
-        extractInfo(text)
-
-        if i >= limit:
+            print("{}{} {}/{} tweets analyzed.".format("="*math.floor(progress*50), "-"*(50 - math.floor(progress*50)), i, limit))
+        if i >= limit - 1:
+            print("{} {}/{} tweets analyzed.".format("="*50, limit, limit))
             print("Finished analyzing tweets.")
             break
 
+        # Clean tweet, and skip to next tweet if it's not relevant/useful.
+        text = cleanTweet(tweet['text'])
+        if not text: continue
+
+        # Information extraction function which actually extracts info and relations and adds them to the awardsDict.
+        extractInfo(DecomposedText(text))
 
 
 # Clean Tweet - Determines if Tweet is usable for information extraction and cleans the text.
-# Ensures text is in English, removes emojis, etc.
+# Ignores retweets, removes hashtags, @ mentions, urls
 def cleanTweet(text):
-    if len(text) < 6: return False
+    if len(text) < 20: return False
     text = demoji(text)
-    if not containsAnyOf(text, ["best", "award", "nominee", "host"]): return False
-    try:
-        if detect(text) != 'en': return False
-    except:
-        return False
-    return text
+    if "RT" in text: return False
+    if not containsAnyOf(text.lower(), ["best", "award", "nominee", "host"]): return False
+    text = " ".join(filter(lambda x: x[0] != '#', text.split()))
+    text = " ".join(filter(lambda x: x[0] != '@', text.split()))
+    text = " ".join(filter(lambda x: x[:4] != 'http', text.split()))
+    return text.lower()
 
-# Information extraction - Takes in a valid Tweet's text and attempts to extract information from it.
-# NOTE - For now, it just extracts awards, as that is the most crucial part to get right.
-def extractInfo(text):
-    # for (type, award, entity) in findRelations(text):
-    #     if award:
-    #         awardsDict.foundRelation(type, award, entity)
 
-    award_name = findAward(text)
+# Information extraction - Takes in a valid Tweet's decomposed text and attempts to extract information from it.
+def extractInfo(Text):
+    award_name = findAward(Text)
     if award_name:
-        awardsDict.foundAward(award_name)
+        awardsTree.foundAward(award_name)
+        findRelations(Text, award_name)
 
+# Show winners - Temporary function to show how well our winners extraction is.
+def ShowWinners():
+    for award in OFFICIAL_AWARDS:
+        winner = awardsTree.getAward(award)
+        if winner:
+            winner = winner[0]['winners']
+            winner = max(winner, key=winner.get)
+        print("{}: {}".format(award, winner))
 
 def main():
     AnalyzeTweets()
+    ShowWinners()
 
 
 if __name__ == "__main__":
