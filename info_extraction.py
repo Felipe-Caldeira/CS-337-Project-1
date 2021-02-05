@@ -79,8 +79,12 @@ def findAward(text):
     dash = False
 
     # check if 'goes' is in the tweet, make sure 'to' comes right after. Extract 'Best Award' from tweet and return
-    if 'goes' in Text.text:
-        goesidx = Text.text.index('goes')
+    if 'goes' in Text.text or 'Goes' in Text.text:
+        try:
+            goesidx = Text.text.index('goes')
+        except:
+            goesidx = Text.text.index('Goes')
+
         if Text.text[goesidx + 1] == 'to':
             if 'Best' in Text.text:
                 award_name = 'Best' + Text.text[Text.text.index('Best') + 1]
