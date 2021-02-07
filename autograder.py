@@ -1,7 +1,7 @@
-'''
+"""
 Version 0.6
 Python 3
-'''
+"""
 import sys
 import json
 import difflib
@@ -60,9 +60,9 @@ def spell_check(r, a, s, scores, weight=1):
 
 
 def calc_translation(result, answer):
-    '''Accepts two lists of strings, determines the best matches
+    """Accepts two lists of strings, determines the best matches
     between them, and returns a translation dictionary and
-    score.'''
+    score."""
 
     resultmap = {norm_text(r): r for r in result}
     answermap = {norm_text(a): a for a in answer}

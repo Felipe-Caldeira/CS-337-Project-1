@@ -1,0 +1,4 @@
+[console_scripts]
+vdb = viztracer:sim_main
+viztracer = viztracer:main
+

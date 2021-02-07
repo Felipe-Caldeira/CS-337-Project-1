@@ -9,7 +9,8 @@ test_nominees = []
 
 # Main pipeline
 
-limit = 10000 # Limit how many tweets to read.
+limit = 10_000  # Limit how many tweets to read.
+
 
 def AnalyzeTweets():
     for i, tweet in enumerate(tweets):
