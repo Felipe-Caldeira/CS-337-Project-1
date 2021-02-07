@@ -12,12 +12,12 @@ import re
 
 # Awards
 AWARDS = [
-    (r"wins (?P<award>best[\w ]+) for", 10),
-    (r"(?P<award>best [\w ]*-[\w ]+)([:-])", 8),
-    (r"(?P<award>best [\w,/ \(\)\-]+) *(:|-|—|goes to)", 5),
-    (r"(?P<award>best [\w,/ \(\)\-]+) is", 4),
-    (r"(?P<award>best [\w,/ \(\)\-]+(musical|comedy|drama))", 4),
-    (r"(receives the|receives|the) (?P<award>(?!golden)[\w .]{1,20} award)", 3)
+    (r"wins (?P<award>best[a-z ]+?) (for|globe[s*]|golden|at|and)", 10),
+    (r"(?P<award>best [a-z ]*-[a-z ]+)([:-])", 8),
+    (r"(?P<award>best [a-z]*-?[a-z,\/ \(\)]+?) *(:|-|—|goes to|from)", 6),
+    (r"(?P<award>best (?!thing)[a-z,\/ \(\)\-]+?) (is|but)", 4),
+    (r"(?P<award>best [a-z,/ \(\)\-]+(musical|comedy|drama))", 5),
+    (r"(receiv.* the|receives) (?P<award>(?!golden)[\w .]{1,20} award)", 5)
 ]
 
 # Winners

@@ -3,3 +3,5 @@ gg2015.json
 __pycache__/
 test.py
 *.json
+*.html
+.vscode/settings.json
