@@ -28,7 +28,11 @@ def AnalyzeTweets():
         if not text: continue
 
         # Information extraction function which actually extracts info and relations and adds them to the awardsDict.
-        extractInfo(DecomposedText(text))
+        extractInfo(text)
+        # award = findAward(text)
+        # if award:
+        #     test_awards.append(award)
+        #     test_nominees.append(text)
 
 
 # Clean Tweet - Determines if Tweet is usable for information extraction and cleans the text.
@@ -44,12 +48,12 @@ def cleanTweet(text):
     return text.lower()
 
 
-# Information extraction - Takes in a valid Tweet's decomposed text and attempts to extract information from it.
-def extractInfo(Text):
-    award_name = findAward(Text)
+# Information extraction - Takes in a valid Tweet's text and attempts to extract information from it.
+def extractInfo(text):
+    award_name = findAward(text)
     if award_name:
         awardsTree.foundAward(award_name)
-        findRelations(Text, award_name)
+        findRelations(text, award_name)
 
 # Show winners - Temporary function to show how well our winners extraction is.
 def ShowWinners():

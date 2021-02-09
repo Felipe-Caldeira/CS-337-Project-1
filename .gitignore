@@ -5,3 +5,5 @@ test.py
 *.json
 .idea
 .DS_Store
+*.html
+.vscode/settings.json

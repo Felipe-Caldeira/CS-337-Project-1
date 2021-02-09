@@ -1,12 +1,12 @@
 from globals import *
 
 # Award name finder - Extracts the name of an award in a text and returns it. Utilizes the AWARDS script.
-def findAward(Text):
+def findAward(text):
     awards = {}
 
     for script in scripts.AWARDS:
         p = scripts.scriptToRegex(script[0], "")
-        matches = p.search(Text.full_text)
+        matches = p.search(text)
 
         if matches:
             award = matches.group('award')
@@ -45,9 +45,9 @@ def findName(str, award_name, script_list):
 # It adds the relation to the respective award_name node in the awardsTree.
 
 
-def findRelations(Text, award_name):
+def findRelations(text, award_name):
     # Winners:
-    winner = findName(Text.full_text, award_name, scripts.WINNERS)
+    winner = findName(text, award_name, scripts.WINNERS)
     if winner:
         awardsTree.foundRelation('winners', award_name, winner)
 

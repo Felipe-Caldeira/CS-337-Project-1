@@ -6,6 +6,7 @@ from difflib import SequenceMatcher
 import json
 import pandas as pd
 import scripts
+from collections import Counter
 
 # The official list of awards
 OFFICIAL_AWARDS = ['cecil b. demille award', 'best motion picture - drama', 'best performance by an actress in a motion picture - drama', 'best performance by an actor in a motion picture - drama', 'best motion picture - comedy or musical', 'best performance by an actress in a motion picture - comedy or musical', 'best performance by an actor in a motion picture - comedy or musical', 'best animated feature film', 'best foreign language film', 'best performance by an actress in a supporting role in a motion picture', 'best performance by an actor in a supporting role in a motion picture', 'best director - motion picture', 'best screenplay - motion picture', 'best original score - motion picture', 'best original song - motion picture', 'best television series - drama', 'best performance by an actress in a television series - drama', 'best performance by an actor in a television series - drama', 'best television series - comedy or musical', 'best performance by an actress in a television series - comedy or musical', 'best performance by an actor in a television series - comedy or musical', 'best mini-series or motion picture made for television', 'best performance by an actress in a mini-series or motion picture made for television', 'best performance by an actor in a mini-series or motion picture made for television', 'best performance by an actress in a supporting role in a series, mini-series or motion picture made for television', 'best performance by an actor in a supporting role in a series, mini-series or motion picture made for television']
@@ -52,8 +53,7 @@ class AwardsTree():
 
     # Converts 'award_name' to keywords and traverses the tree, adding new nodes if necessary, and tallying visited nodes.
     def foundAward(self, award_name):
-        keywords = [token.lemma_ for token in DecomposedText(
-            award_name).doc if token.pos_ in self.allowed_pos]
+        keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
         keywords = adjustLemmas(keywords)
         currNode = self.root
         for i, word in enumerate(keywords):
@@ -76,8 +76,7 @@ class AwardsTree():
     # or if the current node also contains 'entity_name' in its dictionary for 'type', it adds/tallies 'entity_name'
     # in the dictionary 'type'.
     def foundRelation(self, type, award_name, entity_name):
-        keywords = [token.lemma_ for token in DecomposedText(
-            award_name).doc if token.pos_ in self.allowed_pos]
+        keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
         keywords = adjustLemmas(keywords)
         currNode = self.root
         for i, word in enumerate(keywords):
@@ -102,8 +101,7 @@ class AwardsTree():
     # Converts 'award_name' to keywords and traverses tree. Once the last node in the keywords is reached, 
     # it returns a tuple containing the last node's dictionary as well as the list of nodes it visited along the path.
     def getAward(self, award_name):
-        keywords = [token.lemma_ for token in DecomposedText(
-            award_name).doc if token.pos_ in self.allowed_pos]
+        keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
         keywords = adjustLemmas(keywords)
         currNode = self.root
         visited = []
@@ -195,7 +193,6 @@ awardsTree = AwardsTree()
 class DecomposedText():
     def __init__(self, text):
         self.full_text = text
-        text = text.lower()
         self.doc = nlp(text)
         self.text = []
         self.lemma = []
