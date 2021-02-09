@@ -1,6 +1,6 @@
 '''Version 0.35'''
 import tweet_reader
-from globals import awardsDict
+from globals import awardsTree
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama',
                         'best performance by an actress in a motion picture - drama',
@@ -59,10 +59,13 @@ def get_awards(year):
     """Awards is a list of strings. Do NOT change the name
     of this function or what it returns."""
     # Your code here
+    """
     tweet_reader.AnalyzeTweets()
     awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:30])
     awards = list(awardsDict.dict.keys())
     print(awards)
+    """
+    awards = OFFICIAL_AWARDS_1315
     return awards
 
 
@@ -79,8 +82,18 @@ def get_winner(year):
     """Winners is a dictionary with the hard coded award
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns."""
-    # Your code here
-    winners = {award: "" for award in OFFICIAL_AWARDS_1315}
+    tweet_reader.AnalyzeTweets()
+    awards = OFFICIAL_AWARDS_1315
+    winners = {}
+    for award in awards:
+        winner = awardsTree.getAward(award)
+        if winner:
+            winner = winner[0]['winners']
+            winner = max(winner, key=winner.get)
+        else:
+            winner = ""
+        winners[award] = winner.title()
+    print(winners)
     return winners
 
 
@@ -99,6 +112,7 @@ def pre_ceremony():
     plain text file. It is the first thing the TA will run when grading.
     Do NOT change the name of this function or what it returns."""
     # Your code here
+    
     print("Pre-ceremony processing complete.")
     return
 
@@ -110,8 +124,10 @@ def main():
     run when grading. Do NOT change the name of this function or
     what it returns."""
     # Your code here
-    tweet_reader.AnalyzeTweets()
-    awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:20])
+    
+    
+    
+    #awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:20])
     return
 
 
