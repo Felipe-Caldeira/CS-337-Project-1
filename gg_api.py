@@ -93,7 +93,7 @@ def get_winner(year):
         else:
             winner = ""
         winners[award] = winner.title()
-    print(winners)
+    #print(winners)
     return winners
 
 
