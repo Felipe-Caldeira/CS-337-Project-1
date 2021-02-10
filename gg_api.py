@@ -1,6 +1,6 @@
 '''Version 0.35'''
 import tweet_reader
-from globals import awardsTree
+from globals import awardsTree, loadTweets
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama',
                         'best performance by an actress in a motion picture - drama',
@@ -83,17 +83,11 @@ def get_winner(year):
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns."""
     tweet_reader.AnalyzeTweets()
-    awards = OFFICIAL_AWARDS_1315
     winners = {}
-    for award in awards:
-        winner = awardsTree.getAward(award)
-        if winner:
-            winner = winner[0]['winners']
-            winner = max(winner, key=winner.get)
-        else:
-            winner = ""
-        winners[award] = winner.title()
-    #print(winners)
+    for award in OFFICIAL_AWARDS_1315:
+        winner = tweet_reader.GetRelation(award, 'winners')
+        if not winner: winner = ("None")
+        winners[award] = winner[0]
     return winners
 
 
@@ -124,12 +118,8 @@ def main():
     run when grading. Do NOT change the name of this function or
     what it returns."""
     # Your code here
-    
+    print("MAIN WAS RUN")
     
     
     #awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:20])
     return
-
-
-if __name__ == '__main__':
-    main()

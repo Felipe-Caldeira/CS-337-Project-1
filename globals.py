@@ -14,8 +14,12 @@ OFFICIAL_AWARDS = ['cecil b. demille award', 'best motion picture - drama', 'bes
 
 # Initializing tweets from json
 # Load in the tweets json
-with open('data/gg2013.json') as f:
-    tweets = json.load(f)[:]
+tweets = {}
+
+def loadTweets(year):
+    with open('data/gg{}.json'.format(year)) as f:
+        tweets = json.load(f)[:]
+    return tweets
 
 
 # Initializing IMDb API and spacy language model
@@ -60,6 +64,11 @@ class AwardsTree():
         else:
             keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
             keywords = adjustLemmas(keywords)
+            
+            refined = []
+            [refined.append(x) for x in keywords if (x and x not in refined)]
+            keywords = refined
+
             self.kw_cache[award_name] = keywords
         return keywords
 
@@ -280,7 +289,10 @@ def adjustLemmas(words):
             "performance":"", 
             "role":"",
             "language":"",
-            "television":"tv"
+            "television":"tv",
+            "-":"",
+            "comedy":"CM",
+            "musical":"CM",
             }.items():
             if word == original: new_words[i] = new
             if i < len(new_words) - 1 and word in ["actor", "actress"] and new_words[i + 1] == "supporting":
