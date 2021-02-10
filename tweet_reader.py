@@ -15,13 +15,15 @@ limit = min(limit, len(tweets))
 def AnalyzeTweets():
     for i, tweet in enumerate(tweets):
         # Progress meter:
-        if i % 1000 == 0:
-            progress = i/limit
-            print("{}{} {}/{} tweets analyzed.".format("="*math.floor(progress*50), "-"*(50 - math.floor(progress*50)), i, limit))
-        if i >= limit - 1:
-            print("{} {}/{} tweets analyzed.".format("="*50, limit, limit))
-            print("Finished analyzing tweets.")
-            break
+        if i % 1000 == 0 or i + 1 >= limit:
+            progress = (i+1)/limit
+            print("{}{} {}/{} tweets analyzed.".format("="*math.floor(progress*50), "-"*(50 - math.floor(progress*50)), i+1, limit), end='\r')
+            if i + 1 >= limit: 
+                print("Finished analyzing tweets.")
+
+        # text = tweet['text']
+        # if containsAnyOf(text, ['present', 'jessica alba', 'aziz', 'christian bale', 'kriten bell', 'halle berry', 'josh brolin', 'bill clinton', 'megan fox', 'dennis quaid', 'john goodman', 'jennifer garner', 'jamie foxx', 'robert pattison', 'julia roberts']) and "best dress" not in text:
+        #     test_awards.append(text)
 
         # Clean tweet, and skip to next tweet if it's not relevant/useful.
         text = cleanTweet(tweet['text'])
@@ -29,10 +31,8 @@ def AnalyzeTweets():
 
         # Information extraction function which actually extracts info and relations and adds them to the awardsDict.
         extractInfo(text)
-        # award = findAward(text)
-        # if award:
-        #     test_awards.append(award)
-        #     test_nominees.append(text)
+        # if containsAnyOf(text, ['miniseries', 'mini-series', 'mini']):
+        #     test_awards.append(text)
 
 
 # Clean Tweet - Determines if Tweet is usable for information extraction and cleans the text.
@@ -41,32 +41,47 @@ def cleanTweet(text):
     if len(text) < 20: return False
     text = demoji(text)
     if "RT" in text: return False
-    if not containsAnyOf(text.lower(), ["best", "award", "nominee", "host"]): return False
-    text = " ".join(filter(lambda x: x[0] != '#', text.split()))
-    text = " ".join(filter(lambda x: x[0] != '@', text.split()))
+    if not containsAnyOf(text.lower(), ["best", "award", "nominee", "host", "present", "worst"]): return False
+    for word in ["goldenglobes", "goldenglobe", "golden", "globe", "@"]:
+        text.replace(word, '')
+    # text = " ".join(filter(lambda x: x[0] != '#', text.split()))
+    # text = " ".join(filter(lambda x: x[0] != '@', text.split()))
     text = " ".join(filter(lambda x: x[:4] != 'http', text.split()))
     return text.lower()
 
 
 # Information extraction - Takes in a valid Tweet's text and attempts to extract information from it.
 def extractInfo(text):
+    findHosts(text)
     award_name = findAward(text)
-    if award_name:
+    if 'screenplay' in text:
+        test_awards.append(award_name)
+        test_nominees.append(text)
+    if award_name and len(award_name) > 5:
         awardsTree.foundAward(award_name)
         findRelations(text, award_name)
 
-# Show winners - Temporary function to show how well our winners extraction is.
-def ShowWinners():
-    for award in OFFICIAL_AWARDS:
-        winner = awardsTree.getAward(award)
-        if winner:
-            winner = winner[0]['winners']
-            winner = max(winner, key=winner.get)
-        print("{}: {}".format(award, winner))
+
+# Show results - Temporary function to show how well our extraction is for 'type'.
+def ShowResults(type, num_ents=1):
+    for award_name in OFFICIAL_AWARDS:
+        award = awardsTree.getAward(award_name)
+        dictCopy = award[0].dict[type].copy() if award else False
+        entity = 'None'
+        if award:
+            for name, tal in dictCopy.items():
+                for name2, tal2 in dictCopy.items():
+                    if name != name2 and name in name2:
+                        dictCopy[name] += len(name)
+                    if not containsAnyOf(award_name, ['best motion picture', 'film', 'score', 'song', 'score', 'best television', 'best mini']):
+                        if len(name.split()) == 2 and name2 in name:
+                            dictCopy[name] += 2*len(name)
+            entity = Counter(dictCopy).most_common(num_ents)
+        print("{}: {}".format(award_name, entity))
 
 def main():
     AnalyzeTweets()
-    ShowWinners()
+    ShowResults('winners')
 
 
 if __name__ == "__main__":

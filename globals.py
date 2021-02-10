@@ -50,11 +50,27 @@ class AwardsTree():
     def __init__(self):
         self.root = AwardNode("ROOT", None, float('inf'), 0)
         self.allowed_pos = ["NOUN", "PROPN", "ADJ", "ADV", "VERB"]
+        self.kw_cache = {}
+        self.awardNamesDict = {}
+
+    # Converts 'award_name' to keywords
+    def toKeywords(self, award_name):
+        if award_name in self.kw_cache:
+            return self.kw_cache[award_name]
+        else:
+            keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
+            keywords = adjustLemmas(keywords)
+            self.kw_cache[award_name] = keywords
+        return keywords
 
     # Converts 'award_name' to keywords and traverses the tree, adding new nodes if necessary, and tallying visited nodes.
     def foundAward(self, award_name):
-        keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
-        keywords = adjustLemmas(keywords)
+        if award_name in self.awardNamesDict:
+            self.awardNamesDict[award_name] += 1
+        else:
+            self.awardNamesDict[award_name] = 1
+
+        keywords = self.toKeywords(award_name)
         currNode = self.root
         for i, word in enumerate(keywords):
             if not word:
@@ -76,9 +92,9 @@ class AwardsTree():
     # or if the current node also contains 'entity_name' in its dictionary for 'type', it adds/tallies 'entity_name'
     # in the dictionary 'type'.
     def foundRelation(self, type, award_name, entity_name):
-        keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
-        keywords = adjustLemmas(keywords)
+        keywords = self.toKeywords(award_name)
         currNode = self.root
+
         for i, word in enumerate(keywords):
             if not word:
                 continue
@@ -101,8 +117,7 @@ class AwardsTree():
     # Converts 'award_name' to keywords and traverses tree. Once the last node in the keywords is reached, 
     # it returns a tuple containing the last node's dictionary as well as the list of nodes it visited along the path.
     def getAward(self, award_name):
-        keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
-        keywords = adjustLemmas(keywords)
+        keywords = self.toKeywords(award_name)
         currNode = self.root
         visited = []
         for i, word in enumerate(keywords):
@@ -121,7 +136,7 @@ class AwardsTree():
                 # print("Award name not found.")
                 return False
 
-        return (currNode.dict, visited)
+        return (currNode, visited)
 
     # 
     def show(self, depth=6, tally_requirements={1:10, 2:2, 3:2, 4:2}, show_rels=False):
@@ -168,6 +183,9 @@ class AwardNode():
 
     def foundRelation(self, type, award_name, entity_name):
         if entity_name in self.dict[type]:
+            for ent, tal in self.dict[type].items():
+                if ent and ent in entity_name:
+                    self.dict[type][ent] += .5
             self.dict[type][entity_name] += 1
         else:
             self.dict[type][entity_name] = 1
@@ -186,6 +204,9 @@ class AwardNode():
 
 # The one and only, grandiose awardsTree object 
 awardsTree = AwardsTree()
+
+# The dict for hosts!
+hostsDict = {}
 
 
 # Text decomposer: Creates an object that allows one to access the tokenized form of a texxt along with its
@@ -263,9 +284,8 @@ def adjustLemmas(words):
             }.items():
             if word == original: new_words[i] = new
             if i < len(new_words) - 1 and word in ["actor", "actress"] and new_words[i + 1] == "supporting":
-                switch = (i, i + 1)
-    
+                switch= (i, i + 1)
+                
     if switch: 
         new_words[switch[0]], new_words[switch[1]] = new_words[switch[1]], new_words[switch[0]]
     return new_words
-
