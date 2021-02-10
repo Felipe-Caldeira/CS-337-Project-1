@@ -7,3 +7,4 @@ test.py
 .DS_Store
 *.html
 .vscode/settings.json
+venv/
