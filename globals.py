@@ -21,7 +21,6 @@ def loadTweets(year):
         tweets = json.load(f)[:]
     return tweets
 
-
 # Initializing IMDb API and spacy language model
 ia = IMDb()
 nlp = spacy.load("en_core_web_sm")
@@ -65,9 +64,12 @@ class AwardsTree():
             keywords = [token.lemma_ for token in DecomposedText(award_name).doc if token.pos_ in self.allowed_pos]
             keywords = adjustLemmas(keywords)
             
+            keywords = replaceLemmas(keywords, ['mini', 'series'], ['miniserie'])
+
             refined = []
             [refined.append(x) for x in keywords if (x and x not in refined)]
             keywords = refined
+
 
             self.kw_cache[award_name] = keywords
         return keywords
@@ -147,6 +149,9 @@ class AwardsTree():
 
         return (currNode, visited)
 
+    def getKWByRelation(self, type, name):
+        self.root.getKWByRelation(type, name, [])
+
     # 
     def show(self, depth=6, tally_requirements={1:10, 2:2, 3:2, 4:2}, show_rels=False):
         self.root.show(depth, tally_requirements, show_rels)
@@ -210,6 +215,21 @@ class AwardNode():
                 print('|   '*self.depth + self.name + ":", self.tally)
             for child in self.children:
                 child.show(depth, tally_reqs, show_rels)
+    
+    def getKWByRelation(self, type, name, visited):
+        if not self.children:
+            if name in self.dict[type]:
+                print(visited + [self.name], self.tally)
+        else:
+            if name in self.dict[type]:
+                print(visited + [self.name], self.tally)
+                for child in self.children:
+                    child.getKWByRelation(type, name, visited + [self.name])
+            else:
+                for child in self.children:
+                    child.getKWByRelation(type, name, visited + [self.name])
+
+
 
 # The one and only, grandiose awardsTree object 
 awardsTree = AwardsTree()
@@ -293,6 +313,7 @@ def adjustLemmas(words):
             "-":"",
             "comedy":"CM",
             "musical":"CM",
+            "make":""
             }.items():
             if word == original: new_words[i] = new
             if i < len(new_words) - 1 and word in ["actor", "actress"] and new_words[i + 1] == "supporting":
@@ -301,3 +322,19 @@ def adjustLemmas(words):
     if switch: 
         new_words[switch[0]], new_words[switch[1]] = new_words[switch[1]], new_words[switch[0]]
     return new_words
+
+
+def replaceLemmas(keywords, words_list, replacement):
+    start = False
+    for i, kw in enumerate(keywords):
+        cont = False
+        if kw == words_list[0]:
+            words_list.remove(kw)
+            if not start:
+                start = i
+            cont = True
+        if start and not cont:
+            break
+        if not words_list:
+            keywords = keywords[:start] + replacement + keywords[i+1:]
+    return keywords

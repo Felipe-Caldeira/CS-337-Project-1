@@ -1,6 +1,7 @@
 '''Version 0.35'''
 import tweet_reader
 from globals import awardsTree, loadTweets
+import json
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama',
                         'best performance by an actress in a motion picture - drama',
@@ -51,8 +52,8 @@ def get_hosts(year):
     """Hosts is a list of one or more strings. Do NOT change the name
     of this function or what it returns."""
     # Your code here
-    hosts = []
-    return hosts
+    results = tweet_reader.LoadResults()
+    return results['hosts']
 
 
 def get_awards(year):
@@ -82,12 +83,10 @@ def get_winner(year):
     """Winners is a dictionary with the hard coded award
     names as keys, and each entry containing a single string.
     Do NOT change the name of this function or what it returns."""
-    tweet_reader.AnalyzeTweets()
+    results = tweet_reader.LoadResults()
     winners = {}
     for award in OFFICIAL_AWARDS_1315:
-        winner = tweet_reader.GetRelation(award, 'winners')
-        if not winner: winner = ("None")
-        winners[award] = winner[0]
+        winners[award] = results['award_data'][award]['winner']
     return winners
 
 
@@ -106,6 +105,7 @@ def pre_ceremony():
     plain text file. It is the first thing the TA will run when grading.
     Do NOT change the name of this function or what it returns."""
     # Your code here
+    tweet_reader.main()
     
     print("Pre-ceremony processing complete.")
     return
@@ -119,7 +119,4 @@ def main():
     what it returns."""
     # Your code here
     print("MAIN WAS RUN")
-    
-    
-    #awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:20])
     return

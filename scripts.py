@@ -12,15 +12,16 @@ import re
 
 # Awards
 AWARDS = [
-    (r"wins (?P<award>best[a-z ]+?) (for|globe[s*]|golden|at|and) ", 10),
-    (r"wins (?P<award>best [a-z \/]*-?[a-z \/]+)(for |globe[s*] |golden |at |and |\.|$|)", 8), # CHECK IF GOOD 
-    (r"(?P<award>best [a-z ]*-[a-z ]+)([:-])", 8),
-    (r"(?P<award>best [a-z]*-?[a-z,\/ \(\)]+?) *(:|-|—|goes to|from|to) ", 6),
+    (r"wins (?P<award>best[a-z ]+?) at ", 11),
+    (r"wins (?P<award>best[a-z ]+?) (for|globe[s*]|golden|and) ", 10),
+    (r"wins (?P<award>best [a-z \/]*?)(for |globe[s*] |golden |at |and |\.|$)", 8), # CHECK IF GOOD 
+    (r"(?P<award>best [a-z ]*?)([:-])", 8),
+    (r"(?P<award>best [a-z,\/ \(\)]+?) ?(:|-|—|goes to|from|to|!) ", 6),
     (r"(?P<award>best (?!thing)[a-z,\/ \(\)\-]+?) (is|but)", 4),
     (r"(?P<award>best [a-z,/ \(\)\-]+(musical|comedy|drama))", 5),
-    (r"(receiv.* the|receives|present.* the) (?P<award>(?!golden)[\w .]{1,20} award)", 5),
+    (r"(receiv.* the|receives|present.* the) (?P<award>(?!golden)[a-z .]{1,20} award)", 5),
     (r"premio (?P<award>[a-z \.]*?) (por|a)", 4),
-    (r"(?P<award>(?!golden)([\w.]{2,7} ){3}award)", 3)
+    (r"(?P<award>(?!golden)([a-z.]{2,7} ){3}award)", 3)
 ]
 
 # Winners
