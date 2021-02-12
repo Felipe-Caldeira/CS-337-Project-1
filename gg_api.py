@@ -68,9 +68,12 @@ def get_awards(year):
     print(awards)
     """
     awards = tweet_reader.LoadAwardNameResults()["our_guess"]
-    pprint(tweet_reader.LoadAwardNameResults()["translation"])
-    pprint(awards)
-    pprint(len(awards))
+    #translation = tweet_reader.LoadAwardNameResults()["translation"][1]
+    #kept = [award for award in awards if award in translation.keys()]
+    #dropped = [award for award in awards if award not in translation.keys()]
+    #pprint(translation)
+    #pprint(dropped)
+    #pprint(kept)
     return awards
 
 

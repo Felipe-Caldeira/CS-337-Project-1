@@ -4,6 +4,7 @@ import math
 from globals import similar, replaceLemmas, adjustLemmas, DecomposedText
 import difflib
 from pprint import pprint
+import string
 
 # These are just lists used to store certain tweets relating to awards/nominees/etc to analyze what they look like.
 test_awards = []
@@ -89,10 +90,12 @@ def GenerateAwardNameResults():
     i = 1
     while(len(our_award_guesses) < 26):
         top_award_names = Counter(awardsTree.awardNamesDict).most_common(i)
-        x = top_award_names[i - 1]
+        x = top_award_names[i - 1][0]
         # only keep award name guesses that are long enough and start with reasonable words
-        if (containsAnyOf(x[0][:4], ['best', 'ceci']) and len(x[0].split()) > 3):
-            our_award_guesses.append(x[0])
+        if (containsAnyOf(x[:4], ['best', 'ceci'])
+        and len(x.split()) > 3
+        and x.translate(str.maketrans('','',string.punctuation)) not in [y.translate(str.maketrans('','',string.punctuation)) for y in our_award_guesses]):
+            our_award_guesses.append(x.strip())
         i= i+1
     results["our_guess"] = our_award_guesses
     results["translation"] = calc_translation(our_award_guesses, OFFICIAL_AWARDS)
