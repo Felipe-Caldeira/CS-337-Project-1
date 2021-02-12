@@ -60,20 +60,7 @@ def get_hosts(year):
 def get_awards(year):
     """Awards is a list of strings. Do NOT change the name
     of this function or what it returns."""
-    # Your code here
-    """
-    tweet_reader.AnalyzeTweets()
-    awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:30])
-    awards = list(awardsDict.dict.keys())
-    print(awards)
-    """
-    awards = tweet_reader.LoadAwardNameResults()["our_guess"]
-    #translation = tweet_reader.LoadAwardNameResults()["translation"][1]
-    #kept = [award for award in awards if award in translation.keys()]
-    #dropped = [award for award in awards if award not in translation.keys()]
-    #pprint(translation)
-    #pprint(dropped)
-    #pprint(kept)
+    awards = tweet_reader.LoadResults()["award_names"]
     return awards
 
 
