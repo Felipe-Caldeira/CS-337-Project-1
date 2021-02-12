@@ -75,7 +75,10 @@ def get_nominees(year):
     names as keys, and each entry a list of strings. Do NOT change
     the name of this function or what it returns."""
     # Your code here
-    nominees = {award: [] for award in OFFICIAL_AWARDS_1315}
+    results = tweet_reader.LoadResults()
+    nominees = {}
+    for award in OFFICIAL_AWARDS_1315:
+        nominees[award] = results['award_data'][award]['nominees']
     return nominees
 
 
@@ -95,7 +98,10 @@ def get_presenters(year):
     names as keys, and each entry a list of strings. Do NOT change the
     name of this function or what it returns."""
     # Your code here
-    presenters = {award: [] for award in OFFICIAL_AWARDS_1315}
+    results = tweet_reader.LoadResults()
+    presenters = {}
+    for award in OFFICIAL_AWARDS_1315:
+        presenters[award] = results['award_data'][award]['presenters']
     return presenters
 
 

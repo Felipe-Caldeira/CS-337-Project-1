@@ -37,7 +37,7 @@ def cleanTweet(text):
     text = demoji(text)
     if "RT" in text: return False
     text = text.lower()
-    if not containsAnyOf(text, ["best", "award", "nominee", "host", "present", "worst"]): return False
+    if not containsAnyOf(text, ["best", "award", "nominee", "host", "present", "worst", "beat"]): return False
     for word in ["goldenglobes", "goldenglobe", "golden", "globe", "@"]:
         text = text.replace(word, '')
     text = text.replace('mini-series', 'miniseries')
@@ -51,6 +51,17 @@ def extractInfo(text):
     findHosts(text)
     award_name = findAward(text)
     if award_name and len(award_name) > 5:
+        # if containsAnyOf(text, [
+        #     'connie britton',
+        #     'glenn close',
+        #     'michelle dockery',
+        #     'julianna marguiles',
+        #     'nathan fillion',
+        #     'lea michele'
+        # ]) and 'claire danes' in text:
+        #     test_awards.append(award_name)
+        #     test_nominees.append(text)
+        # pass
         awardsTree.foundAward(award_name)
         findRelations(text, award_name)
 
@@ -61,12 +72,12 @@ def GenerateResults():
     results["hosts"] = GetHosts()
     results["award_data"] = {award:{} for award in OFFICIAL_AWARDS}
     for award in OFFICIAL_AWARDS:
-        results["award_data"][award]['nominees'] = GetRelation(award, 'nominees', 1)
-        results["award_data"][award]['presenters'] = GetRelation(award, 'presenters', 1)
+        results["award_data"][award]['nominees'] = GetRelation(award, 'nominees', 4)
+        results["award_data"][award]['presenters'] = GetRelation(award, 'presenters', 2)
         results["award_data"][award]['winner'] = GetRelation(award, 'winners', 1)[0]
 
     with open('results.json', 'w') as file:
-        json.dump(results, file)
+        json.dump(results, file, ensure_ascii=False)
 
 
 
@@ -85,6 +96,38 @@ def GetHosts():
         hosts = hosts[0]
     return [x[0] for x in hosts]
 
+# def GetNomineesAndPresenters():
+#     results = LoadResults()
+#     for i, tweet in enumerate(tweets):
+#         # Progress meter:
+#         if i % 1000 == 0 or i + 1 >= limit:
+#             progress = (i+1)/limit
+#             print("{}{} {}/{} tweets analyzed.".format("="*math.floor(progress*50),
+#                                                        "-"*(50 - math.floor(progress*50)), i+1, limit), end='\r')
+#             if i + 1 >= limit:
+#                 print("Finished analyzing tweets, again.")
+#                 break
+
+#         text = demoji(tweet['text'])
+#         if containsAnyOf(text, ['RT']): continue
+#         for award in results['award_data']:
+#             if results['award_data'][award]['winner'] in text.lower():
+#                 names = DecomposedText(text).doc.ents
+#                 for name in names:
+#                     if name.label_ != 'PERSON': continue
+#                     name = name.text.lower()
+#                     if (name not in results['award_data'][award]['winner']) and \
+#                     (results['award_data'][award]['winner'] not in name) and \
+#                     (not similar(results['award_data'][award]['winner'], name) > .8) and \
+#                         (not containsAnyOf(name, ['golden', 'globe', 'http'])):
+#                         if "present" in text.lower():
+#                             awardsTree.foundRelation('presenters', award, name)
+#                         else:
+#                             if not containsAnyOf(award, ['best motion picture', 'film', 'score', 'song', 'score', 'cecil', 'best television', 'best mini']):
+#                                 awardsTree.foundRelation('nominees', award, name)
+
+        
+
 
 # Relations getter
 def GetRelation(award_name, type, num_ents=1):
@@ -94,6 +137,8 @@ def GetRelation(award_name, type, num_ents=1):
     if award:
         for name, tal in dictCopy.items():
             for name2, tal2 in dictCopy.items():
+                if similar(name, name2) > .9:
+                    dictCopy[name] *= 2
                 if name != name2 and name in name2:
                     dictCopy[name] += len(name)
                 if not containsAnyOf(award_name, ['best motion picture', 'film', 'score', 'song', 'score', 'best television', 'best mini']):
@@ -103,10 +148,27 @@ def GetRelation(award_name, type, num_ents=1):
     
     return [x[0] for x in entity] if len(entity) > 0 else [('None')]
 
+
+def condense(awards_list):
+    condensed = awards_list[:]
+    for award in awards_list:
+        for another in awards_list:
+            if award != another and \
+                (award in another) and \
+                    award in condensed:
+                condensed.remove(award)
+    return condensed
+
+
+def isSublistOf(A, B):
+    n = len(A)
+    return any(A == B[i:i + n] for i in range(len(B)-n + 1))
+
 def main():
     AnalyzeTweets()
     GenerateResults()
-    LoadResults()
+    print(condense([x[0] for x in Counter(awardsTree.awardNamesDict).most_common(
+        20) if containsAnyOf(x[0][:4], ['best', 'ceci'])]))
     print("Finished!")
 
 if __name__ == "__main__":

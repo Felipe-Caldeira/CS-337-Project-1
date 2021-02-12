@@ -14,9 +14,9 @@ import re
 AWARDS = [
     (r"wins (?P<award>best[a-z ]+?) at ", 11),
     (r"wins (?P<award>best[a-z ]+?) (for|globe[s*]|golden|and) ", 10),
-    (r"wins (?P<award>best [a-z \/]*?)(for |globe[s*] |golden |at |and |\.|$)", 8), # CHECK IF GOOD 
+    (r"wins (?P<award>best [a-z \/\-]*?)(for |globe[s*] |golden |at |and |\.|$)", 8), # CHECK IF GOOD 
     (r"(?P<award>best [a-z ]*?)([:-])", 8),
-    (r"(?P<award>best [a-z,\/ \(\)]+?) ?(:|-|—|goes to|from|to|!) ", 6),
+    (r"(?P<award>best [a-z,\/ \(\)\-]+?) ?(:|-|—|goes to|from|to|!) ", 6),
     (r"(?P<award>best (?!thing)[a-z,\/ \(\)\-]+?) (is|but)", 4),
     (r"(?P<award>best [a-z,/ \(\)\-]+(musical|comedy|drama))", 5),
     (r"(receiv.* the|receives|present.* the) (?P<award>(?!golden)[a-z .]{1,20} award)", 5),
@@ -44,6 +44,17 @@ ALT_WINNER = [
     (r"(picture|song):(?P<name>[a-z ]*) by", 8),
     (r"(\"|\()(?P<name>[a-z ]*)(\"|\))", 5),
     (r"best.* goes to [a-z ]* for (?P<name>[a-z ]*)", 5)
+]
+
+# Nominees
+NOMINEES = [
+    (r"wanted (?P<name>[a-z ]*) to win", 7),
+    (r"\"(?P<name>[a-z ]*)\".* (lost|not .*(win|won))", 4),
+    (r"^(?P<name>[a-z ]*) (was|is) nominated", 4),
+    (r"(but|and) (?P<name>[a-z ]*) should have won", 4),
+    (r"(but|beat|and) (?P<name>[a-z ]*) for", 4),
+    (r"(and|but) (?P<name>[a-z ]*) didn't win", 6),
+    (r"i hope (?P<name>[a-z ]*) win", 5),
 ]
 
 # Presenters

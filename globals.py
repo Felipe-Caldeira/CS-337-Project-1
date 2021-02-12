@@ -2,7 +2,7 @@ import spacy
 import re
 import en_core_web_sm
 from imdb import IMDb
-from difflib import SequenceMatcher
+import Levenshtein
 import json
 import pandas as pd
 import scripts
@@ -58,6 +58,7 @@ class AwardsTree():
 
     # Converts 'award_name' to keywords
     def toKeywords(self, award_name):
+        award_name = award_name.replace('mini-serie', 'miniserie')
         if award_name in self.kw_cache:
             return self.kw_cache[award_name]
         else:
@@ -65,10 +66,14 @@ class AwardsTree():
             keywords = adjustLemmas(keywords)
             
             keywords = replaceLemmas(keywords, ['mini', 'series'], ['miniserie'])
-
             refined = []
             [refined.append(x) for x in keywords if (x and x not in refined)]
             keywords = refined
+
+            if "miniserie" in keywords:
+                keywords = replaceLemmas(keywords, ['series', 'miniserie', 'motion', 'picture'], [])
+                keywords = replaceLemmas(keywords, ['motion', 'picture', 'tv'], [])
+
 
 
             self.kw_cache[award_name] = keywords
@@ -219,10 +224,10 @@ class AwardNode():
     def getKWByRelation(self, type, name, visited):
         if not self.children:
             if name in self.dict[type]:
-                print(visited + [self.name], self.tally)
+                print(visited + [self.name], self.dict[type][name])
         else:
             if name in self.dict[type]:
-                print(visited + [self.name], self.tally)
+                print(visited + [self.name], self.dict[type][name])
                 for child in self.children:
                     child.getKWByRelation(type, name, visited + [self.name])
             else:
@@ -268,7 +273,7 @@ class DecomposedText():
 
 # This function returns a metric (0 to 1) for how similar strings a and b are.
 def similar(a, b):
-    return SequenceMatcher(None, a, b).ratio()
+    return Levenshtein.ratio(a, b)
 
 
 # Clean emojis from tweets
@@ -337,4 +342,5 @@ def replaceLemmas(keywords, words_list, replacement):
             break
         if not words_list:
             keywords = keywords[:start] + replacement + keywords[i+1:]
+            break
     return keywords
