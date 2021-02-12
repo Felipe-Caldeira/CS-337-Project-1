@@ -2,6 +2,7 @@
 import tweet_reader
 from globals import awardsTree, loadTweets
 import json
+from pprint import pprint
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama',
                         'best performance by an actress in a motion picture - drama',
@@ -66,7 +67,10 @@ def get_awards(year):
     awards = list(awardsDict.dict.keys())
     print(awards)
     """
-    awards = OFFICIAL_AWARDS_1315
+    awards = tweet_reader.LoadAwardNameResults()["our_guess"]
+    pprint(tweet_reader.LoadAwardNameResults()["translation"])
+    pprint(awards)
+    pprint(len(awards))
     return awards
 
 
