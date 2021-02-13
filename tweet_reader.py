@@ -41,7 +41,7 @@ def cleanTweet(text):
     text = demoji(text)
     if "RT" in text: return False
     text = text.lower()
-    if not containsAnyOf(text, ["best", "award", "nominee", "host", "present", "worst", "beat"]): return False
+    if not containsAnyOf(text, ["best", "award", "nominee", "nominated", "host", "present", "worst", "beat"]): return False
     for word in ["goldenglobes", "goldenglobe", "golden", "globe", "@"]:
         text = text.replace(word, '')
     text = text.replace('mini-series', 'miniseries')
@@ -84,7 +84,6 @@ def GenerateResults():
     with open('results.json', 'w') as file:
         json.dump(results, file, ensure_ascii=False)
 
-# Generate Results - Generates our award name guesses in a JSON
 def GetAwardNames():
     our_award_guesses = []
     i = 1

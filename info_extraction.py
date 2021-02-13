@@ -60,6 +60,8 @@ def findRelations(text, award_name):
     winner = findNames(text, award_name, scripts.WINNERS)
     if winner:
         awardsTree.foundRelation('winners', award_name, winner[0])
+        # All winners were nominated, so let's put them in as guesses
+        awardsTree.foundRelation('nominees', award_name, winner[0])
 
     # Nominees: TODO
 
