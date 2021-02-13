@@ -68,9 +68,9 @@ def get_awards(year):
     print(awards)
     """
     awards = tweet_reader.LoadAwardNameResults()["our_guess"]
-    pprint(tweet_reader.LoadAwardNameResults()["translation"])
-    pprint(awards)
-    pprint(len(awards))
+    # pprint(tweet_reader.LoadAwardNameResults()["translation"])
+    # pprint(awards)
+    # pprint(len(awards))
     return awards
 
 

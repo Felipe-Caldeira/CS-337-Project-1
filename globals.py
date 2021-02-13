@@ -80,6 +80,8 @@ class AwardsTree():
         return keywords
 
     # Converts 'award_name' to keywords and traverses the tree, adding new nodes if necessary, and tallying visited nodes.
+    # This is the function that is called immediately after using the AWARDS regex script, which does not use hardcoded part of award names.
+    # The award_name is immediately stored in the awardNamesDict, which is used to select generate our selection of award names, without being modified at all.
     def foundAward(self, award_name):
         if award_name in self.awardNamesDict:
             self.awardNamesDict[award_name] += 1
