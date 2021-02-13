@@ -1,7 +1,8 @@
 '''Version 0.35'''
 import tweet_reader
-from globals import awardsTree, loadTweets
-import json
+#from globals import awardsTree, loadTweets
+from image_download import downloadImages
+#import json
 from pprint import pprint
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama',
@@ -60,17 +61,7 @@ def get_hosts(year):
 def get_awards(year):
     """Awards is a list of strings. Do NOT change the name
     of this function or what it returns."""
-    # Your code here
-    """
-    tweet_reader.AnalyzeTweets()
-    awardsDict.dict = dict(sorted(awardsDict.dict.items(), key=lambda x: x[1]['tally'], reverse=True)[:30])
-    awards = list(awardsDict.dict.keys())
-    print(awards)
-    """
-    awards = tweet_reader.LoadAwardNameResults()["our_guess"]
-    # pprint(tweet_reader.LoadAwardNameResults()["translation"])
-    # pprint(awards)
-    # pprint(len(awards))
+    awards = tweet_reader.LoadResults()["award_names"]
     return awards
 
 
@@ -109,15 +100,18 @@ def get_presenters(year):
     return presenters
 
 
-def pre_ceremony():
+def pre_ceremony(year):
     """This function loads/fetches/processes any data your program
     will use, and stores that data in your DB or in a json, csv, or
     plain text file. It is the first thing the TA will run when grading.
     Do NOT change the name of this function or what it returns."""
     # Your code here
     tweet_reader.main()
-    
     print("Pre-ceremony processing complete.")
+    results = tweet_reader.LoadResults()
+    best_dressed = results["additional_goals"]["best dressed"].title()
+    print("Best Dressed:", best_dressed)
+    downloadImages(year, best_dressed, "best dressed")
     return
 
 
