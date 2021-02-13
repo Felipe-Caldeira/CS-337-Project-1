@@ -106,8 +106,9 @@ def pre_ceremony():
     Do NOT change the name of this function or what it returns."""
     # Your code here
     tweet_reader.main()
-    
     print("Pre-ceremony processing complete.")
+    results = tweet_reader.LoadResults()
+    print("Best Dressed:", results["additional_goals"]["best dressed"].title())
     return
 
 

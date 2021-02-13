@@ -1,8 +1,7 @@
 from langdetect import detect
 from info_extraction import *
 import math
-from globals import similar, replaceLemmas, adjustLemmas, DecomposedText
-import difflib
+from globals import similar 
 from pprint import pprint
 import string
 
@@ -74,12 +73,14 @@ def extractInfo(text):
 def GenerateResults():
     results = {}
     results["hosts"] = GetHosts()
-    results["award_names"] =GetAwardNames()
+    results["award_names"] = GetAwardNames()
     results["award_data"] = {award:{} for award in OFFICIAL_AWARDS}
     for award in OFFICIAL_AWARDS:
         results["award_data"][award]['nominees'] = GetRelation(award, 'nominees', 4)
         results["award_data"][award]['presenters'] = GetRelation(award, 'presenters', 2)
         results["award_data"][award]['winner'] = GetRelation(award, 'winners', 1)[0]
+    results["additional_goals"] = {"best dressed" : GetRelation("best dressed", 'winners', 1)[0]
+    }
 
     with open('results.json', 'w') as file:
         json.dump(results, file, ensure_ascii=False)
