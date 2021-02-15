@@ -51,19 +51,16 @@ def cleanTweet(text):
 # Information extraction - Takes in a valid Tweet's text and attempts to extract information from it.
 def extractInfo(text):
     findHosts(text)
+    findBestDressed(text)
     award_name = findAward(text)
+    # if containsAnyOf(text, [
+    #     'kristen bell',
+    #     'john krasinski'
+    # ]):
+    # # ]) and 'claire danes' in text:
+    #     test_awards.append(award_name)
+    #     test_nominees.append(text)
     if award_name and len(award_name) > 5:
-        # if containsAnyOf(text, [
-        #     'connie britton',
-        #     'glenn close',
-        #     'michelle dockery',
-        #     'julianna marguiles',
-        #     'nathan fillion',
-        #     'lea michele'
-        # ]) and 'claire danes' in text:
-        #     test_awards.append(award_name)
-        #     test_nominees.append(text)
-        # pass
         awardsTree.foundAward(award_name)
         findRelations(text, award_name)
 

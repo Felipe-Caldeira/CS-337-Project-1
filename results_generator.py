@@ -26,7 +26,7 @@ def GenerateResults():
 def GetAwardNames():
     our_award_guesses = []
     i = 1
-    while(len(our_award_guesses) < 50):
+    while(len(our_award_guesses) < 100):
         top_award_names = Counter(awardsTree.awardNamesDict).most_common(i)
         x = top_award_names[i - 1][0]
         # only keep award name guesses that start with reasonable words
@@ -37,7 +37,7 @@ def GetAwardNames():
                 and x.translate(str.maketrans('', '', string.punctuation)) not in [y.translate(str.maketrans('', '', string.punctuation)) for y in our_award_guesses]):
             our_award_guesses.append(x.strip())
         i = i+1
-    return condense(our_award_guesses)
+    return condense(our_award_guesses)[:26]
 
 
 def LoadResults():
@@ -56,7 +56,6 @@ def GetHosts():
         hosts = hosts[0]
     return [x[0] for x in hosts]
 
-
 # Relations getter
 def GetRelation(award_name, type, num_ents=1):
     award = awardsTree.getAward(award_name)
@@ -65,7 +64,7 @@ def GetRelation(award_name, type, num_ents=1):
     if award:
         for name, tal in dictCopy.items():
             for name2, tal2 in dictCopy.items():
-                if similar(name, name2) > .9:
+                if name != name2 and similar(name, name2) > .9:
                     dictCopy[name] *= 2
                 if name != name2 and name in name2:
                     dictCopy[name] += len(name)

@@ -60,12 +60,13 @@ def findRelations(text, award_name):
     winner = findNames(text, award_name, scripts.WINNERS)
     if winner:
         awardsTree.foundRelation('winners', award_name, winner[0])
-        # All winners were nominated, so let's put them in as guesses
-        awardsTree.foundRelation('nominees', award_name, winner[0])
 
-    # Nominees: TODO
+    # Nominees:
+    nominees = findNames(text, award_name, scripts.NOMINEES)
+    if nominees:
+        for nominee in nominees: awardsTree.foundRelation('nominees', award_name, nominee)
 
-    # Presenters: TODO
+    # Presenters: 
     presenters = findNames(text, award_name, scripts.PRESENTERS, 2)
     if presenters and presenters[0]:
         awardsTree.foundRelation('presenters', award_name, presenters[0])
@@ -84,6 +85,14 @@ def findHosts(text):
             else:
                 hostsDict[host] = 1
 
+
+# Best dressed finder - Finds names of best dressed 'candidates'
+def findBestDressed(text):
+    if "best dressed" not in text: return
+    candidates = findNames(text, "", scripts.BEST_DRESSED, 10)
+    if candidates:
+        for candidate in candidates:
+            if 'best' not in candidate: awardsTree.foundRelation('winners', 'best dressed', candidate)
 
 
 # Person and Movie identifier - Takes in a string and determines if it is the name of a person or a movie.
