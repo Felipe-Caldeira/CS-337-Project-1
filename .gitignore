@@ -8,3 +8,4 @@ test.py
 *.html
 .vscode/settings.json
 venv/
+ALL_TWEETS.txt

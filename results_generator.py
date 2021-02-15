@@ -69,8 +69,8 @@ def GetRelation(award_name, type, num_ents=1):
                 if name != name2 and name in name2:
                     dictCopy[name] += len(name)
                 if not containsAnyOf(award_name, ['best motion picture', 'film', 'score', 'song', 'score', 'best television', 'best mini']):
-                    if len(name.split()) == 2 and name2 in name:
-                        dictCopy[name] += 2*len(name)
+                    if len(name.split()) == 2 and name2 in name and name != name2:
+                        dictCopy[name] += 2*dictCopy[name2]
         entity = Counter(dictCopy).most_common(num_ents)
 
     return [x[0] for x in entity] if len(entity) > 0 else [('None')]
