@@ -106,7 +106,7 @@ def pre_ceremony(year):
     plain text file. It is the first thing the TA will run when grading.
     Do NOT change the name of this function or what it returns."""
     # Your code here
-    tweet_reader.main()
+    tweet_reader.main(year)
     print("Pre-ceremony processing complete.")
     results = tweet_reader.LoadResults()
     best_dressed = results["additional_goals"]["best dressed"].title()

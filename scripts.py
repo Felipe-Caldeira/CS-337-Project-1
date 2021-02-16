@@ -44,7 +44,9 @@ ALT_WINNER = [
     (r"(to | - |for |: )\"(?P<name>[a-z]*)\"", 9),
     (r"(picture|song):(?P<name>[a-z ]*) by", 8),
     (r"(\"|\()(?P<name>[a-z ]*)(\"|\))", 5),
-    (r"best.* goes to [a-z ]* for (?P<name>[a-z ]*)", 5)
+    (r"best.* goes to [a-z ]* for (?P<name>[a-z ]*)", 5),
+    (r"best original score - .* - (?P<name>[A-Za-z ]*)(?:[-!.])", 40),
+    (r"best original score.*(?:\"|')(?P<name>[A-Za-z ]*)(?:\"|')", 40)
 ]
 
 # Nominees
@@ -60,6 +62,14 @@ NOMINEES = [
     (r"[AWARD] nominee (?P<name>[a-z ]*?) ?(is|should|[.,!])", 5),
     (r"nominee (?P<name>[a-z ]*?) ?(is|should|[.,!])", 3)
 ]
+
+NOMINEES_2 = [
+    (r"(?P<name>(?:[A-Z][a-z]+? )+)(?:beat out|beats|beat) (?P<names>(?:[A-Z][a-z, ]+?)+)(?: for| in| at|[.!&?:])", 10),
+    (r"(?P<name>(?:[A-Z][a-z]+? )+)(?:beat|beats|beat out) (?P<name2>(?:[A-Z][a-z]+? )+)(and|AND|&amp;) (?P<name3>(?:[A-Z][A-Za-z]+? ?)+)(?:[.,!?]| for| at| in)", 8),
+    (r"(?P<name>(?:[A-Z][a-z]+? )+)(?:lost to) (?P<name2>(?:[A-Z][a-z]+? )+)", 7)
+]
+
+NAMES_SPLITTER = r"(?P<name>(?:[A-Z][a-z ]+?)+)(,| and|$)"
 
 # Presenters
 PRESENTERS = [
@@ -82,10 +92,10 @@ HOSTS = [
 
 # Best Dressed
 BEST_DRESSED = [
-    (r"best dressed(: |\.{3,} |was )[PERSON]", 8),
-    (r"best dressed.*?: [PERSON]", 10),
-    (r"[PERSON] is my (pick|best dressed|fav)", 7),
-    (r"[PERSON](,| and) ", 5)
+    (r"[Bb]est [Dd]ressed(: |\.{3,} |was )(?P<name>[A-Z][a-z]+ [A-Z][a-z]+\b)", 8),
+    (r"[Bb]est [Dd]ressed.*?: (?P<name>[A-Z][a-z]+ [A-Z][a-z]+\b)", 10),
+    (r"(?P<name>[A-Z][a-z]+ [A-Z][a-z]+\b) is my (pick|[Bb]est [Dd]ressed|fav)", 7),
+    (r"[Bb]est [Dd]ressed.*?: (?P<name>(?:[A-Z][a-z, ]+)+)(in |[,.!])", 7)
 ]
 
 # Converts scripts to actual regex patterns

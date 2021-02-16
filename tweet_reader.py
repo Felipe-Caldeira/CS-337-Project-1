@@ -3,25 +3,33 @@ from info_extraction import *
 import math
 from globals import similar, replaceLemmas, adjustLemmas, DecomposedText
 from results_generator import *
+import viztracer
 
 # These are just lists used to store certain tweets relating to awards/nominees/etc to analyze what they look like.
 test_awards = []
 test_nominees = []
 
-# Load tweets and limit how many tweets to read
-tweets = loadTweets(2013)
-limit = len(tweets)
+def main(year):
+    # Load tweets and limit how many tweets to read
+    tweets = loadTweets(year)
+    limit = len(tweets)
+    AnalyzeTweets(tweets, limit)
+    print("Finished!")
 
 # Main pipeline
-limit = min(limit, len(tweets))
-def AnalyzeTweets():
+def AnalyzeTweets(tweets, limit):
+    limit = min(limit, len(tweets))
+    # Part 1:
+    # tracer = viztracer.VizTracer()
+    # tracer.start()
+    print("Analyzing tweets for Award Names and Winners...")
     for i, tweet in enumerate(tweets):
         # Progress meter:
         if i % 1000 == 0 or i + 1 >= limit:
             progress = (i+1)/limit
             print("{}{} {}/{} tweets analyzed.".format("="*math.floor(progress*50), "-"*(50 - math.floor(progress*50)), i+1, limit), end='\r')
             if i + 1 >= limit: 
-                print("Finished analyzing tweets.")
+                print("\nFinished analyzing tweets (Part 1).")
                 break
 
         # Clean tweet, and skip to next tweet if it's not relevant/useful.
@@ -29,7 +37,36 @@ def AnalyzeTweets():
         if not text: continue
 
         # Information extraction function which actually extracts info and relations and adds them to the awardsDict.
-        extractInfo(text)
+        try: extractInfo(text)
+        except: continue
+    
+    # tracer.stop()
+    # tracer.save()
+    # Generate the results in the correct json format
+    results = GenerateResults()
+
+    # Part 2:
+    winners_awards_list = [(results['award_data'][award]['winner'], award) for award in results['award_data']]
+
+    print("Analyzing tweets for Nominees and Presenters...")
+    for i, tweet in enumerate(tweets):
+        if i % 1000 == 0 or i + 1 >= limit:
+            progress = (i+1)/limit
+            print("{}{} {}/{} tweets analyzed.".format("="*math.floor(progress*50), "-"*(50 - math.floor(progress*50)), i+1, limit), end='\r')
+            if i + 1 >= limit:
+                print("\nFinished analyzing tweets (Part 2).")
+                break
+
+        text = cleanTweetPt2(tweet['text'])
+        if not text: continue
+        if not containsAnyOf(text.lower(), ['best dressed'] + [winners[0] for winners in winners_awards_list]): continue
+
+        try: extractInfoPt2(text, winners_awards_list) 
+        except: continue
+
+    results = GenerateResults(long=True)
+    StoreResults(results)
+
 
 
 # Clean Tweet - Determines if Tweet is usable for information extraction and cleans the text.
@@ -47,28 +84,29 @@ def cleanTweet(text):
     text = " ".join(filter(lambda x: x[:4] != 'http', text.split()))
     return text
 
+def cleanTweetPt2(text):
+    if len(text) < 20: return False
+    text = demoji(text)
+    if 'RT' in text: return False
+    if not containsAnyOf(text.lower(), ["beat", "lost to", "best dressed"]): return False
+    text = text.replace("@", '')
+    text = " ".join(filter(lambda x: x[:4] != 'http', text.split()))
+    return text
+
 
 # Information extraction - Takes in a valid Tweet's text and attempts to extract information from it.
 def extractInfo(text):
     findHosts(text)
-    findBestDressed(text)
     award_name = findAward(text)
-    # if containsAnyOf(text, [
-    #     'kristen bell',
-    #     'john krasinski'
-    # ]):
-    # # ]) and 'claire danes' in text:
-    #     test_awards.append(award_name)
-    #     test_nominees.append(text)
     if award_name and len(award_name) > 5:
         awardsTree.foundAward(award_name)
         findRelations(text, award_name)
 
+def extractInfoPt2(text, winners_list):
+    findNominees(text, winners_list)
+    findBestDressed(text)
+    # findPresenters(text)
 
-def main():
-    AnalyzeTweets()
-    GenerateResults()
-    print("Finished!")
 
 if __name__ == "__main__":
-    main()
+    main(2013)
