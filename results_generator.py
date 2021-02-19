@@ -13,18 +13,22 @@ def GenerateResults(long=False):
     results["hosts"] = GetHosts()
     results["award_names"] = GetAwardNames()
     results["award_data"] = {award: {} for award in OFFICIAL_AWARDS}
-    for award in OFFICIAL_AWARDS:
+    for i, award in enumerate(OFFICIAL_AWARDS):
+        print("{}/{} Award relations generated".format(i+1, len(OFFICIAL_AWARDS)), end='\r')
         results["award_data"][award]['nominees'] = GetRelation(award, 'nominees', 4, long=long)
         results["award_data"][award]['presenters'] = GetRelation(award, 'presenters', 2, long=long)
         results["award_data"][award]['winner'] = GetRelation(award, 'winners', 1, long=long)[0]
     results["additional_goals"] = {"best dressed": GetRelation("best dressed", 'winners', 1, long=long)[0]
     }
-    print("Finished generating results.")
+    print("\nFinished generating results.")
     return results
 
 
 def GetAwardNames():
-    return [x[0] for x in condense(Counter(awardsTree.awardNamesDict).most_common(110)) if (containsAnyOf(x[0][:4], ['best', 'ceci']) and len(x[0].split()) > 3)][:26]
+    modified = [awardName.replace(',', '') for awardName in awardsTree.awardNamesDict]
+    modified = [awardName.replace('-', '') for awardName in modified]
+    modified = [awardName for awardName in modified if containsAnyOf(awardName[:4], ['best', 'ceci'])]
+    return condense([x[0] for x in Counter(awardsTree.awardNamesDict).most_common(500) if (containsAnyOf(x[0][:4], ['best', 'ceci']) and len(x[0].split()) > 3)])[:26]
     # our_award_guesses = []
     # i = 1
     # while(len(our_award_guesses) < 100):
@@ -64,9 +68,9 @@ def GetHosts():
 # Relations getter
 def GetRelation(award_name, type, num_ents=1, long=False):
     award = awardsTree.getAward(award_name)
-    dictCopy = award[0].dict[type].copy() if award else False
     entity = [('', 0)]
     if award:
+        dictCopy = award[0].dict[type].copy()
         if 'best dressed' not in award_name:
             for name, tal in dictCopy.items():
                 for name2, tal2 in dictCopy.items():
@@ -77,7 +81,7 @@ def GetRelation(award_name, type, num_ents=1, long=False):
                     if containsAnyOf(award_name, PERSON_AWARDS):
                         if len(name.split()) == 2 and name2 in name and name != name2:
                             dictCopy[name] += 2*dictCopy[name2]
-        entity = Counter(dictCopy).most_common(num_ents)
+        entity = Counter(dictCopy).most_common(num_ents + 3)
     
     if not len(entity) > 0: return ['']
     if containsAnyOf(award_name, PERSON_AWARDS) or type == 'presenters':
@@ -89,7 +93,7 @@ def GetRelation(award_name, type, num_ents=1, long=False):
                 if search: search_res.append(search[0]['name'].replace(' nickname', '').strip().lower())
             else: 
                 search_res.append(name[0])
-        return search_res if search_res else ['']
+        return search_res[:num_ents] if search_res else ['']
     
     if containsAnyOf(award_name, MOVIE_AWARDS):
         search_res = []
@@ -100,15 +104,17 @@ def GetRelation(award_name, type, num_ents=1, long=False):
                 if search: search_res.append(search[0]['title'].strip().lower())
             else:
                 search_res.append(title[0])
-        return search_res if search_res else ['']
-    return [x[0] for x in entity] if len(entity) > 0 else ['']
+        return search_res[:num_ents] if search_res else ['']
+    return [x[0] for x in entity[:num_ents]] if len(entity) > 0 else ['']
+
+
 
 def condense(awards_list):
     condensed = awards_list[:]
     for award in awards_list:
         for another in awards_list:
-            if award != another and \
-                (award in another) and \
-                    award in condensed:
+            unique = True
+            if award[0] != another[0] and (award[0] in another[0]) and award in condensed:
+
                 condensed.remove(award)
     return condensed

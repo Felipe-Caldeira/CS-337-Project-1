@@ -162,7 +162,9 @@ class AwardsTree():
         return (currNode, visited)
 
     def getKWByRelation(self, type, name):
-        self.root.getKWByRelation(type, name, [])
+        results = []
+        self.root.getKWByRelation(type, name, [], results)
+        return results
 
     # 
     def show(self, depth=6, tally_requirements={1:10, 2:2, 3:2, 4:2}, show_rels=False):
@@ -216,6 +218,16 @@ class AwardNode():
         else:
             self.dict[type][entity_name] = 1
 
+    def mergeDictFrom(self, other):
+        if self == other: return
+        for type, type_dict in other.dict.items():
+            for name, tally in type_dict.items():
+                if name in self.dict[type]:
+                    self.dict[type][name] += other.dict[type][name]
+                else:
+                    self.dict[type][name] = other.dict[type][name]
+
+
     def show(self, depth, tally_reqs, show_rels):
         tally_req = tally_reqs[self.depth] if (
             tally_reqs and self.depth in tally_reqs) else 1
@@ -228,18 +240,20 @@ class AwardNode():
             for child in self.children:
                 child.show(depth, tally_reqs, show_rels)
     
-    def getKWByRelation(self, type, name, visited):
+    def getKWByRelation(self, type, name, visited, results):
         if not self.children:
             if name in self.dict[type]:
-                print(visited + [self.name], self.dict[type][name])
+                # print(visited + [self.name], self.dict[type][name])
+                results.append(visited + [self.name])
         else:
             if name in self.dict[type]:
-                print(visited + [self.name], self.dict[type][name])
+                # print(visited + [self.name], self.dict[type][name])
+                results.append(visited + [self.name])
                 for child in self.children:
-                    child.getKWByRelation(type, name, visited + [self.name])
+                    child.getKWByRelation(type, name, visited + [self.name], results)
             else:
                 for child in self.children:
-                    child.getKWByRelation(type, name, visited + [self.name])
+                    child.getKWByRelation(type, name, visited + [self.name], results)
 
 
 

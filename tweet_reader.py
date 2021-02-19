@@ -88,7 +88,7 @@ def cleanTweetPt2(text):
     if len(text) < 20: return False
     text = demoji(text)
     if 'RT' in text: return False
-    if not containsAnyOf(text.lower(), ["beat", "lost to", "best dressed"]): return False
+    if not containsAnyOf(text.lower(), ["beat", "lost to", "best dressed", "present"]): return False
     text = text.replace("@", '')
     text = " ".join(filter(lambda x: x[:4] != 'http', text.split()))
     return text
@@ -105,6 +105,8 @@ def extractInfo(text):
 def extractInfoPt2(text, winners_list):
     findNominees(text, winners_list)
     findBestDressed(text)
+    if 'present' in text:
+        test_awards.append(text)
     # findPresenters(text)
 
 

@@ -26,7 +26,7 @@ progressbar==2.5
 pycodestyle==2.6.0
 pylint==2.5.2
 python-dateutil==2.8.1
-python-Levenshtein @ file:///D:/bld/python-levenshtein_1612200656976/work
+python-Levenshtein-wheels==0.13.2
 python-magic-bin==0.4.14
 pytz==2020.5
 regex==2020.11.13
