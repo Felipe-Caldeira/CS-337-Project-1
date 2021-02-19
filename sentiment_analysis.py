@@ -4,6 +4,7 @@ from info_extraction import  *
 from tweet_reader import *
 from textblob import TextBlob
 import Levenshtein
+import sys
 
 def host_in_tweet(tweet, hosts):
     '''
@@ -42,6 +43,8 @@ def host_in_tweet(tweet, hosts):
         # has "tinafey"
         host_names_without_space.append(host.replace(" ", ''))
 
+    host_related_words = ["host", "hosted", "hosts"]
+
     # splitting the tweet's text into individual words and
     # searching for either of the hosts' first or last name, or the whole name
     # (with or without a space)
@@ -49,7 +52,7 @@ def host_in_tweet(tweet, hosts):
 
     # tests if two strings are fairly similar
     def are_similar(str1, str2):
-        return Levenshtein.ratio(str1, str2) >= 0.8
+        return Levenshtein.ratio(str1, str2) >= 0.9
 
     # checking first for any approx. matches between a host name (like "tina fey"(
     # and anything in the tweet's text, the are_similar tries to account for
@@ -66,10 +69,16 @@ def host_in_tweet(tweet, hosts):
         if poss_match:
             return (1.0, tweet)
 
-    # checking last for matches between a host first or last name
+    # checking third for matches between a host first or last name
     # like "tina" or "fey"
     for host_partial_name in hosts_partial_names:
         poss_match = [word for word in split_tweet_text if are_similar(host_name, word)]
+        if poss_match:
+            return (0.7, tweet)
+
+    # checking last for matches between host related words (like "hosts", "hosted")
+    for host_related_word in host_related_words:
+        poss_match = [word for word in split_tweet_text if are_similar(word, host_related_word)]
         if poss_match:
             return (0.7, tweet)
 
@@ -101,8 +110,6 @@ def sa_pipeline(year):
             # polarity is calculated by the TextBlob module,
             # it is in the range of [-1.0, 1.0]
             tweet_polarity = (TextBlob(tweet_text)).sentiment.polarity
-            if tweet_polarity < 0:
-                print('here')
             weight = tweet_tuple[0]
 
             polarity_sum += (tweet_polarity * weight)
@@ -126,4 +133,4 @@ def sa_pipeline(year):
 
 
 if __name__ == "__main__":
-    print(sa_pipeline(2013))
+    print(sa_pipeline(sys.argv[1]))
