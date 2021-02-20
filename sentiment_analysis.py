@@ -1,8 +1,6 @@
-from gg_api import *
 from globals import *
 from info_extraction import  *
 from tweet_reader import *
-from textblob import TextBlob
 import Levenshtein
 import sys
 from emotions import emotions
@@ -44,8 +42,6 @@ def host_in_tweet(tweet, hosts):
         # has "tinafey"
         host_names_without_space.append(host.replace(" ", ''))
 
-    #host_related_words = ["host", "hosted", "hosts"]
-
     # splitting the tweet's text into individual words and
     # searching for either of the hosts' first or last name, or the whole name
     # (with or without a space)
@@ -76,18 +72,11 @@ def host_in_tweet(tweet, hosts):
         poss_match = [word for word in split_tweet_text if are_similar(host_name, word)]
         if poss_match:
             return (0.7, tweet)
-    """
-    # checking last for matches between host related words (like "hosts", "hosted")
-    for host_related_word in host_related_words:
-        poss_match = [word for word in split_tweet_text if are_similar(word, host_related_word)]
-        if poss_match:
-            return (0.7, tweet)
-    """
     # this tweet likely isn't associated with either host
     return False
 
 def sa_pipeline(year):
-    hosts = get_hosts(year)  # obtain the hosts found for given year
+    hosts = LoadResults()['hosts'] # obtain the hosts found for given year
     print("Loading Tweets...")
     all_tweets = loadTweets(year) # load all tweets for filtering
 

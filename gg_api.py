@@ -4,6 +4,7 @@ import tweet_reader
 from image_download import downloadImages
 #import json
 from pprint import pprint
+from sentiment_analysis import sa_pipeline
 
 OFFICIAL_AWARDS_1315 = ['cecil b. demille award', 'best motion picture - drama',
                         'best performance by an actress in a motion picture - drama',
@@ -112,6 +113,7 @@ def pre_ceremony(year):
     best_dressed = results["additional_goals"]["best dressed"].title()
     print("Best Dressed:", best_dressed)
     downloadImages(year, best_dressed, "best dressed")
+    print(sa_pipeline(year))
     return
 
 
