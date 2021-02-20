@@ -1,5 +1,8 @@
 # CS-338-Project-1: Golden Globes Twitter analyzer
 
+## Github Repository:
+https://github.com/Felipe-Caldeira/CS-337-Project-1
+
 ## Instructions:
 
 ### Installation:
