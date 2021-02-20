@@ -4,9 +4,17 @@
 
 ### Installation:
 
+Set up a conda environment with Python 3.8.
+
+```
+conda create -n new_env_name python=3.8
+```
+
 ```
 pip install -r requirements.txt
 ```
+
+If the autograder is missing a `sqlite3` DLL file, you can fix it by manually installing the DLL file from online and placing it in the DLLs folder in the Anaconda directory.
 
 ### Running the autograder:
 
