@@ -20,6 +20,15 @@ pip install -r requirements.txt
 ```
 
 If the autograder is missing a `sqlite3` DLL file, you can fix it by manually installing the DLL file from online and placing it in the DLLs folder in the Anaconda directory.
+https://www.sqlite.org/download.html
+
+There may be some issues installing the spacy. If so, comment out those modules from requirements.txt, and run:
+
+```
+pip install spacy
+python -m spacy download en_core_web_sm
+```
+
 
 ### Running the autograder:
 
