@@ -5,15 +5,15 @@
 ### Installation:
 
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Running the autograder:
 
 ```
-python3 -c 'import gg_api; gg_api.pre_ceremony(2013)'
-python3 autograder.py 2013
-python3 sentiment_analysis.py 2013
+python -c 'import gg_api; gg_api.pre_ceremony(2013)'
+python autograder.py 2013
+python sentiment_analysis.py 2013
 ```
 
 etc. for each year desired
